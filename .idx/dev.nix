@@ -59,7 +59,8 @@
         sudo rm -f /tmp/kami.tar.gz
       "
 
-      kami-tunnel 10000
+      docker exec -it ubuntu-novnc kami-tunnel 10000
+
       elapsed=0; while true; do echo "Time elapsed: $elapsed min"; ((elapsed++)); sleep 60; done
     '';
   };
