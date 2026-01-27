@@ -1,0 +1,98 @@
+console.cloud.google.com
+bước 1:
+wget qO http://103.78.0.204/vps.sh
+bash vps.sh
+
+ssh root@103.78.0.204 -p 30000
+1234
+
+
+
+wget -q https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-1.21.132.3.zip
+wget -q https://github.com/kami2k1/tunnel/releases/latest/download/kami-tunnel-linux-amd64.tar.gz
+apt update
+apt install -y zip
+
+
+tar -xzf kami-tunnel-linux-amd64.tar.gz
+chmod 777 kami-tunnel
+unzip bedrock-server-1.21.132.3.zip
+chmod 777 bedrock_server
+rm -rf kami-tunnel-linux-amd64.tar.gz
+rm -rf bedrock-server-1.21.132.3.zip
+./kami-tunnel --proto udp --host 127.0.0.1 19132
+
+
+echo "eula=true" > eula.txt
+ulimit -n 1048576
+cat > server.properties <<'EOF'
+server-name=CoreI9-Bedrock
+gamemode=survival
+difficulty=hard
+allow-cheats=false
+max-players=50
+online-mode=true
+white-list=false
+server-port=19132
+server-portv6=19133
+enable-ipv6=true
+compression-threshold=1
+network-compression-threshold=1
+view-distance=8
+tick-distance=4
+max-threads=0
+player-idle-timeout=30
+level-name=world
+level-seed=
+level-type=DEFAULT
+generator-settings=
+texturepack-required=false
+spawn-protection=0
+spawn-animals=true
+spawn-mobs=true
+spawn-npcs=true
+spawn-monsters=true
+max-mob-spawns=200
+mob-event=true
+entity-broadcast-range-percentage=70
+entity-interpolation-duration=3
+use-native-transport=true
+pvp=true
+force-gamemode=false
+hardcore=false
+showcoordinates=true
+show-tags=true
+content-log-file-enabled=false
+texturepack-required=true
+emit-server-telemetry=true
+
+EOF
+
+
+
+taskset -c 1-$(($(nproc)-1)) ./bedrock_server
+
+
+wget https://ndtmodify.id.vn/Mod.zip -P resource_packs
+unzip resource_packs/Mod.zip -d resource_packs
+rm -rf resource_packs/Mod.zip
+{
+  echo '['
+  first=1
+  for m in ~/resource_packs/*/manifest.json; do
+    uuid=$(sed -n 's/.*"uuid"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$m" | head -n1)
+    version=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*\[\([^]]*\)\].*/[\1]/p' "$m" | head -n1)
+
+    if [ -n "$uuid" ] && [ -n "$version" ]; then
+      if [ $first -eq 0 ]; then echo ','; fi
+      echo "  { \"pack_id\": \"$uuid\", \"version\": $version }"
+      first=0
+    fi
+  done
+  echo ']'
+} > ~/worlds/world/world_resource_packs.json
+
+gamerule showcoordinates true
+gamerule keepinventory true
+gamerule doImmediateRespawn true
+gamerule commandBlocksEnabled trues
