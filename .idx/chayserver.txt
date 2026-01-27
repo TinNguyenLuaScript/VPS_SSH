@@ -1,10 +1,4 @@
-console.cloud.google.com
-bước 1:
-wget qO http://103.78.0.204/vps.sh
-bash vps.sh
-
-ssh root@103.78.0.204 -p 30000
-1234
+ssh root@103.78.0.204 -p cổng
 
 
 
@@ -23,54 +17,50 @@ rm -rf bedrock-server-1.21.132.3.zip
 ./kami-tunnel --proto udp --host 127.0.0.1 19132
 
 
+
+
+set -euo pipefail
 echo "eula=true" > eula.txt
-ulimit -n 1048576
 cat > server.properties <<'EOF'
 server-name=CoreI9-Bedrock
 gamemode=survival
 difficulty=hard
 allow-cheats=false
-max-players=50
+max-players=300
 online-mode=true
 white-list=false
 server-port=19132
-server-portv6=19133
 enable-ipv6=true
+view-distance=10
+tick-distance=8
+max-threads=0
 compression-threshold=1
 network-compression-threshold=1
-view-distance=8
-tick-distance=4
-max-threads=0
-player-idle-timeout=30
-level-name=world
-level-seed=
-level-type=DEFAULT
-generator-settings=
-texturepack-required=false
-spawn-protection=0
 spawn-animals=true
 spawn-mobs=true
 spawn-npcs=true
 spawn-monsters=true
-max-mob-spawns=200
-mob-event=true
-entity-broadcast-range-percentage=70
-entity-interpolation-duration=3
+max-mob-spawns=400
+entity-broadcast-range-percentage=100
+entity-interpolation-duration=1
 use-native-transport=true
+player-idle-timeout=15
+spawn-protection=0
 pvp=true
-force-gamemode=false
-hardcore=false
 showcoordinates=true
-show-tags=true
-content-log-file-enabled=false
-texturepack-required=true
-emit-server-telemetry=true
-
+emit-server-telemetry=false
 EOF
+ulimit -n 1048576 || ulimit -n 65536
+ulimit -u 65536 || true
+CPU=$(nproc)
+if [ "$CPU" -gt 1 ]; then CORE="1-$((CPU-1))"; else CORE="0"; fi
+CMD="./bedrock_server"
+command -v numactl >/dev/null 2>&1 && CMD="numactl --interleave=all $CMD"
+command -v ionice  >/dev/null 2>&1 && CMD="ionice -c2 -n0 $CMD"
+command -v taskset >/dev/null 2>&1 && CMD="taskset -c $CORE $CMD"
+prlimit --nofile=1048576 --nproc=65536 -- $CMD
 
 
-
-taskset -c 1-$(($(nproc)-1)) ./bedrock_server
 
 
 wget https://ndtmodify.id.vn/Mod.zip -P resource_packs
