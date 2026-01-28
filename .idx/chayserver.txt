@@ -4,6 +4,7 @@ docker exec -it ubuntu-ssh /usr/local/bin/kami-tunnel tcp --proto udp --host 127
 ssh root@103.78.0.204 -p cổng
 pass là root
 
+
 wget -q https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-1.21.132.3.zip
 wget -q https://github.com/kami2k1/tunnel/releases/latest/download/kami-tunnel-linux-amd64.tar.gz
 apt update
@@ -14,21 +15,24 @@ unzip bedrock-server-1.21.132.3.zip
 chmod 777 bedrock_server
 rm -rf kami-tunnel-linux-amd64.tar.gz
 rm -rf bedrock-server-1.21.132.3.zip
-clear
+
+
+
+
 set -euo pipefail
 echo "eula=true" > eula.txt
 cat > server.properties <<'EOF'
-server-name=CoreI9-Bedrock
+server-name=TKTgaming
 gamemode=survival
 difficulty=hard
 allow-cheats=false
-max-players=10000
+max-players=1000
 online-mode=true
 white-list=false
 server-port=19132
-enable-ipv6=true
-view-distance=10
-tick-distance=8
+enable-ipv6=false
+view-distance=100
+tick-distance=64
 max-threads=0
 compression-threshold=1
 network-compression-threshold=1
@@ -36,15 +40,15 @@ spawn-animals=true
 spawn-mobs=true
 spawn-npcs=true
 spawn-monsters=true
-max-mob-spawns=400
-entity-broadcast-range-percentage=100
+max-mob-spawns=999999
+entity-broadcast-range-percentage=999
 entity-interpolation-duration=1
 use-native-transport=true
-player-idle-timeout=15
+player-idle-timeout=0
 spawn-protection=0
 pvp=true
 showcoordinates=true
-emit-server-telemetry=false
+emit-server-telemetry=true
 EOF
 ulimit -n 1048576 || ulimit -n 65536
 ulimit -u 65536 || true
