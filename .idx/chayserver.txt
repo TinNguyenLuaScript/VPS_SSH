@@ -85,4 +85,4 @@ rm -rf resource_packs/Mod.zip
 gamerule showcoordinates true
 gamerule keepinventory true
 gamerule doImmediateRespawn true
-gamerule commandBlocksEnabled trues
+gamerule commandBlocksEnabled true
